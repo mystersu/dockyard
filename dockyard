@@ -185,6 +185,8 @@ function install_nginx {
   configure
   build
   install_binaries
+  mkdir /var/lib/nginx
+  rm -rf /tmp/nginx*
 }
 
 function install_ruby {
