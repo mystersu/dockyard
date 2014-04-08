@@ -159,14 +159,29 @@ function apply_nginx_syslog_patch {
   fi
 }
 
+function add_nginx_gridfs_support {
+  nginx_gridfs_repo_url="https://github.com/mystersu/nginx-gridfs.git"
+  nginx_gridfs_path="/tmp/nginx-gridfs"
+
+  if [ ! -e $nginx_gridfs_path ]; then
+    git clone $nginx_gridfs_repo_url $nginx_gridfs_path
+    cd /tmp/nginx-gridfs
+    git submodule update --init
+  else 
+    cd /tmp/nginx-gridfs
+    git pull
+    git submodule update --init
+  fi
+}
+
 function install_nginx {
   url="http://nginx.org/download/nginx-$version.tar.gz"
   required_packages="unzip libpcre3 libpcre3-dev libssl-dev libpcrecpp0 zlib1g-dev libgd2-xpm-dev"
-  configure_cmd="./configure --with-http_ssl_module --with-http_spdy_module --with-http_gzip_static_module --with-http_stub_status_module --add-module=/tmp/nginx_syslog_patch"
+  configure_cmd="./configure --with-http_ssl_module --with-http_spdy_module --with-http_gzip_static_module --with-http_stub_status_module --with-pcre-jit --add-module=/tmp/nginx-gridfs"
   download_url $url
   install_required_packages
   extract
-  apply_nginx_syslog_patch
+  add_nginx_gridfs_support
   configure
   build
   install_binaries
